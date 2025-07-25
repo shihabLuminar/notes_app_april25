@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:notes_app/controller/notes_controller.dart';
 import 'package:notes_app/view/notes_screen/notes_screen.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await NotesController.initializeDb();
   runApp(const MyApp());
 }
 
