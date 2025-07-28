@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:notes_app/controller/notes_controller.dart';
 import 'package:notes_app/view/widget/note_card.dart';
 
 class NotesScreen extends StatefulWidget {
@@ -9,6 +10,17 @@ class NotesScreen extends StatefulWidget {
 }
 
 class _NotesScreenState extends State<NotesScreen> {
+  @override
+  void initState() {
+    getnotes();
+    super.initState();
+  }
+
+  Future<void> getnotes() async {
+    await NotesController.getAllNotes();
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,8 +34,9 @@ class _NotesScreenState extends State<NotesScreen> {
       ),
       body: ListView.separated(
         padding: EdgeInsets.symmetric(horizontal: 20),
-        itemCount: 10,
-        itemBuilder: (context, index) => NoteCard(),
+        itemCount: NotesController.notes.length,
+        itemBuilder:
+            (context, index) => NoteCard(note: NotesController.notes[index]),
 
         separatorBuilder: (context, index) => SizedBox(height: 16),
       ),
@@ -31,6 +44,10 @@ class _NotesScreenState extends State<NotesScreen> {
   }
 
   Future<dynamic> customBottomSheet(BuildContext context) {
+    TextEditingController titleC = TextEditingController();
+    TextEditingController descC = TextEditingController();
+    TextEditingController dateC = TextEditingController();
+
     return showModalBottomSheet(
       isScrollControlled: true,
       backgroundColor: Colors.black,
@@ -51,6 +68,7 @@ class _NotesScreenState extends State<NotesScreen> {
                   ),
                 ),
                 TextField(
+                  controller: titleC,
                   decoration: InputDecoration(
                     fillColor: Colors.white,
                     filled: true,
@@ -61,6 +79,7 @@ class _NotesScreenState extends State<NotesScreen> {
                   ),
                 ),
                 TextField(
+                  controller: descC,
                   maxLines: 3,
                   decoration: InputDecoration(
                     fillColor: Colors.white,
@@ -72,6 +91,7 @@ class _NotesScreenState extends State<NotesScreen> {
                   ),
                 ),
                 TextField(
+                  controller: dateC,
                   decoration: InputDecoration(
                     fillColor: Colors.white,
                     filled: true,
@@ -100,7 +120,24 @@ class _NotesScreenState extends State<NotesScreen> {
                 ),
 
                 ElevatedButton(onPressed: () {}, child: Text("CANCEL")),
-                ElevatedButton(onPressed: () {}, child: Text("SAVE")),
+                ElevatedButton(
+                  onPressed: () async {
+                    if (titleC.text.isNotEmpty &&
+                        descC.text.isNotEmpty &&
+                        dateC.text.isNotEmpty) {
+                      await NotesController.addNote(
+                        title: titleC.text.toString(),
+                        description: descC.text.toString(),
+                        date: dateC.text.toString(),
+                      );
+                      Navigator.pop(context);
+                      setState(() {});
+                    } else {
+                      print("Enter all fields");
+                    }
+                  },
+                  child: Text("SAVE"),
+                ),
               ],
             ),
           ),

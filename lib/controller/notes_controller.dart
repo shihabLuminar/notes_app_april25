@@ -1,3 +1,6 @@
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:notes_app/core/constants/db_constants.dart';
 import 'package:notes_app/model/note_model.dart';
 import 'package:sqflite/sqflite.dart';
@@ -18,10 +21,41 @@ class NotesController {
     );
   }
 
-  static void addNote() {}
+  static Future<void> addNote({
+    required String title,
+    required String description,
+    required String date,
+  }) async {
+    await database.rawInsert(
+      'INSERT INTO ${DBConstants.notes}(${DBConstants.notetitle}, ${DBConstants.noteDesc}, ${DBConstants.noteDate}) VALUES(?, ?, ?)',
+      [title, description, date],
+    );
+    await getAllNotes();
+  }
 
-  static void updateNote() {}
-  static void deleteNote() {}
-  static void getAllNotes() {}
+  static Future<void> getAllNotes() async {
+    List data = await database.rawQuery('SELECT * FROM ${DBConstants.notes}');
+
+    notes =
+        data
+            .map(
+              (note) => NoteModel(
+                id: note[DBConstants.noteId],
+                title: note[DBConstants.notetitle],
+                description: note[DBConstants.noteDesc],
+                date: note[DBConstants.noteDate],
+              ),
+            )
+            .toList();
+  }
+
+  static Future<void> updateNote() async {
+    await getAllNotes();
+  }
+
+  static Future<void> deleteNote() async {
+    await getAllNotes();
+  }
+
   static void shareNote() {}
 }
