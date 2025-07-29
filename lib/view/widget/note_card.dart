@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:notes_app/controller/notes_controller.dart';
+
 import 'package:notes_app/model/note_model.dart';
 
 class NoteCard extends StatelessWidget {
-  const NoteCard({super.key, required this.note});
+  const NoteCard({super.key, required this.note, this.onDelete, this.onEdit});
   final NoteModel note;
+  final void Function()? onDelete;
+  final void Function()? onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -20,20 +23,23 @@ class NoteCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text(
-                note.title,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+              Expanded(
+                child: Text(
+                  note.title,
+                  maxLines: 2,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                ),
               ),
-              Spacer(),
-              IconButton(onPressed: () {}, icon: Icon(Icons.edit)),
-              IconButton(onPressed: () {}, icon: Icon(Icons.delete)),
+
+              IconButton(onPressed: onEdit, icon: Icon(Icons.edit)),
+              IconButton(onPressed: onDelete, icon: Icon(Icons.delete)),
             ],
           ),
           Text(note.description, style: TextStyle(fontSize: 12)),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Text(note.date),
+              Expanded(child: Text(note.date, maxLines: 1)),
               IconButton(onPressed: () {}, icon: Icon(Icons.share)),
             ],
           ),

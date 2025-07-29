@@ -1,15 +1,18 @@
-import 'dart:developer';
-import 'dart:io';
-
+import 'package:flutter/foundation.dart';
 import 'package:notes_app/core/constants/db_constants.dart';
 import 'package:notes_app/model/note_model.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 
 class NotesController {
   static List<NoteModel> notes = [];
   static late Database database;
 
   static Future<void> initializeDb() async {
+    if (kIsWeb) {
+      // Change default factory on the web
+      databaseFactory = databaseFactoryFfiWeb;
+    }
     database = await openDatabase(
       "notes.db",
       version: 1,
@@ -53,7 +56,11 @@ class NotesController {
     await getAllNotes();
   }
 
-  static Future<void> deleteNote() async {
+  static Future<void> deleteNote(int id) async {
+    await database.rawDelete(
+      'DELETE FROM ${DBConstants.notes} WHERE ${DBConstants.noteId} = ?',
+      [id],
+    );
     await getAllNotes();
   }
 

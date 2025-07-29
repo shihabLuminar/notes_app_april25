@@ -36,7 +36,16 @@ class _NotesScreenState extends State<NotesScreen> {
         padding: EdgeInsets.symmetric(horizontal: 20),
         itemCount: NotesController.notes.length,
         itemBuilder:
-            (context, index) => NoteCard(note: NotesController.notes[index]),
+            (context, index) => NoteCard(
+              note: NotesController.notes[index],
+              onEdit: () {},
+              onDelete: () async {
+                await NotesController.deleteNote(
+                  NotesController.notes[index].id,
+                );
+                setState(() {});
+              },
+            ),
 
         separatorBuilder: (context, index) => SizedBox(height: 16),
       ),
