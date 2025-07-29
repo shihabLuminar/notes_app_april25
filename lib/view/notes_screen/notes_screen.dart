@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:notes_app/controller/notes_controller.dart';
+import 'package:notes_app/model/note_model.dart';
 import 'package:notes_app/view/widget/note_card.dart';
 
 class NotesScreen extends StatefulWidget {
@@ -38,7 +39,14 @@ class _NotesScreenState extends State<NotesScreen> {
         itemBuilder:
             (context, index) => NoteCard(
               note: NotesController.notes[index],
-              onEdit: () {},
+              onEdit: () {
+                //update note sheet
+                customBottomSheet(
+                  context,
+                  isEdit: true,
+                  note: NotesController.notes[index],
+                );
+              },
               onDelete: () async {
                 await NotesController.deleteNote(
                   NotesController.notes[index].id,
@@ -52,10 +60,20 @@ class _NotesScreenState extends State<NotesScreen> {
     );
   }
 
-  Future<dynamic> customBottomSheet(BuildContext context) {
+  Future<dynamic> customBottomSheet(
+    BuildContext context, {
+    bool isEdit = false,
+    NoteModel? note,
+  }) {
     TextEditingController titleC = TextEditingController();
     TextEditingController descC = TextEditingController();
     TextEditingController dateC = TextEditingController();
+
+    if (isEdit) {
+      titleC.text = note!.title;
+      descC.text = note.description;
+      dateC.text = note.date;
+    }
 
     return showModalBottomSheet(
       isScrollControlled: true,
@@ -69,7 +87,7 @@ class _NotesScreenState extends State<NotesScreen> {
               spacing: 16,
               children: [
                 Text(
-                  "Add note",
+                  isEdit ? "Update Note" : "Add note",
                   style: TextStyle(
                     fontSize: 25,
                     fontWeight: FontWeight.bold,
@@ -134,18 +152,28 @@ class _NotesScreenState extends State<NotesScreen> {
                     if (titleC.text.isNotEmpty &&
                         descC.text.isNotEmpty &&
                         dateC.text.isNotEmpty) {
-                      await NotesController.addNote(
-                        title: titleC.text.toString(),
-                        description: descC.text.toString(),
-                        date: dateC.text.toString(),
-                      );
+                      if (isEdit) {
+                        await NotesController.updateNote(
+                          id: note!.id,
+                          title: titleC.text.toString(),
+                          des: descC.text.toString(),
+                          date: dateC.text.toString(),
+                        );
+                      } else {
+                        await NotesController.addNote(
+                          title: titleC.text.toString(),
+                          description: descC.text.toString(),
+                          date: dateC.text.toString(),
+                        );
+                      }
+
                       Navigator.pop(context);
                       setState(() {});
                     } else {
                       print("Enter all fields");
                     }
                   },
-                  child: Text("SAVE"),
+                  child: Text(isEdit ? "Update" : "SAVE"),
                 ),
               ],
             ),

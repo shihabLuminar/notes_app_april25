@@ -52,7 +52,16 @@ class NotesController {
             .toList();
   }
 
-  static Future<void> updateNote() async {
+  static Future<void> updateNote({
+    required String title,
+    required String des,
+    required String date,
+    required int id,
+  }) async {
+    await database.rawUpdate(
+      'UPDATE ${DBConstants.notes} SET ${DBConstants.notetitle} = ?, ${DBConstants.noteDesc} = ?, ${DBConstants.noteDate} = ? WHERE  ${DBConstants.noteId} = ?',
+      [title, des, date, id],
+    );
     await getAllNotes();
   }
 
